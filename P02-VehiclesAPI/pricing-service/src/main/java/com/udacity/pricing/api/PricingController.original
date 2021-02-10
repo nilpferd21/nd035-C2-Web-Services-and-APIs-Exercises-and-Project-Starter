@@ -23,8 +23,9 @@ public class PricingController {
      * @return price of the vehicle, or error that it was not found.
      */
     @GetMapping
-    public Price get(@RequestParam Long vehicleId) {
+    public Price get(@RequestParam (name = "id") Long vehicleId) {
         try {
+            //long vehicleId = 2;
             return PricingService.getPrice(vehicleId);
         } catch (PriceException ex) {
             throw new ResponseStatusException(
