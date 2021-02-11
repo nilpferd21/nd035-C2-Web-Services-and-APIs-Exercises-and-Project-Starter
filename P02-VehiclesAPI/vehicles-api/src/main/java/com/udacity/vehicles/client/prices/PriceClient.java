@@ -32,14 +32,17 @@ public class PriceClient {
      */
     public String getPrice(Long vehicleId) {
         try {
-            Price price = client
+            Price price; // = client
+
+            WebClient.ResponseSpec res = client
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("services/price/")
-                            .queryParam("vehicleId", vehicleId)
+                            .path("/prices/" + vehicleId.toString())
                             .build()
                     )
-                    .retrieve().bodyToMono(Price.class).block();
+                    .retrieve();
+
+            price = res.bodyToMono(Price.class).block();
 
             return String.format("%s %s", price.getCurrency(), price.getPrice());
 
