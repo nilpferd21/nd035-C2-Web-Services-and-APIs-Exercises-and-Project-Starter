@@ -3,7 +3,12 @@ package com.udacity.vehicles.service;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Implements the car service create, read, update or delete
@@ -15,12 +20,18 @@ public class CarService {
 
     private final CarRepository repository;
 
-    public CarService(CarRepository repository) {
+    @Autowired
+    private WebClient maps; //   @Bean(name="maps")
+    private WebClient pricing;
+
+    public CarService(CarRepository repository, WebClient maps, WebClient pricing) {
         /**
          * TODO: Add the Maps and Pricing Web Clients you create
-         *   in `VehiclesApiApplication` as arguments and set them here.
+         *   in `VehiclesApiApplication` as arguments and set them here. --> Done
          */
         this.repository = repository;
+        this.maps = maps;
+        this.pricing = pricing;
     }
 
     /**
