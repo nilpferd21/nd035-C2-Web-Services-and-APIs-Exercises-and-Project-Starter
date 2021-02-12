@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/cars")
+@ApiResponses(value = {
+        @ApiResponse(code=201, message = "Vehicle has been successfully created."),
+        @ApiResponse(code=204, message = "Vehicle has been successfully deleted."),
+        @ApiResponse(code=400, message = "This is a bad request, please follow the API documentation for the proper request format."),
+        @ApiResponse(code=404, message = "Vehicle was not found. "),
+        @ApiResponse(code=500, message = "The server is down. Please start the microservices.")
+})
+
 class CarController {
 
     private final CarService carService;
