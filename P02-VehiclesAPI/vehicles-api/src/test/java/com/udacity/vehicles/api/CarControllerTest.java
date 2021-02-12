@@ -1,5 +1,6 @@
 package com.udacity.vehicles.api;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,7 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.udacity.vehicles.client.maps.MapsClient;
+import com.udacity.vehicles.client.prices.Price;
 import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.Condition;
 import com.udacity.vehicles.domain.Location;
@@ -20,7 +25,13 @@ import com.udacity.vehicles.domain.car.Details;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.service.CarService;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,8 +42,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Implements testing of the CarController class.
@@ -94,10 +108,25 @@ public class CarControllerTest {
         /**
          * TODO: Add a test to check that the `get` method works by calling
          *   the whole list of vehicles. This should utilize the car from `getCar()`
-         *   below (the vehicle will be the first in the list).
+         *   below (the vehicle will be the first in the list). --> Done
          */
 
-    }
+        MvcResult mvcResult =
+                mvc.perform(
+                get(new URI("/cars")))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JSONObject jsonObj = new JSONObject(json).getJSONObject("_embedded").getJSONArray("carList").getJSONObject(0);
+        Car retrievedCar = mapper.readValue(jsonObj.toString(), Car.class);
+
+        Car origCar = getCar();
+        origCar.setId(1L);
+        assertThat(retrievedCar).isEqualToComparingFieldByFieldRecursively(origCar);
+   }
 
     /**
      * Tests the read operation for a single car by ID.
